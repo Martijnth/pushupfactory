@@ -24,6 +24,10 @@ class Teams(models.Model):
     name = models.CharField(max_length=100, blank=False, null=False)
     deleted = models.BooleanField(default=False)
 
+    @property
+    def users(self):
+        return TeamUsers.objects.filter(team=self)
+
 
 class TeamUsers(models.Model):
 
