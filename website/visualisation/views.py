@@ -41,7 +41,7 @@ class VisualisationView(viewsets.ViewSet):
 
         workout_sets = workout_sets.order_by('workout__user_id', 'created_at')
 
-        timestamps = [(start_date + timedelta(days=day_index)).strftime('%Y-%m-%d') for day_index in range((end_date - start_date).days)]
+        timestamps = [(start_date + timedelta(days=day_index)).strftime('%Y-%m-%d') for day_index in range((end_date - start_date).days + 1)]
 
         team_member_result = {team_member[0]: {'name': team_member[1], 'data': [None] * len(timestamps)} for team_member in Workouts.objects.values('user_id').filter(date__gte=start_date, date__lte=end_date).order_by('user_id').distinct().values_list('user_id', 'user__first_name')}
 
