@@ -18,10 +18,19 @@ class WorkoutsAPI(viewsets.ViewSet):
 
         workout = request.data.get('workout', None)
         if workout is None:
-            return Response({'message':' You need to specify a workout in the post request'}, status=500)
+            return Response({'message':' You need to specify a `workout` in the post request'}, status=500)
+
+        date_time = request.data.get('date', None)
+        if date_time is None or len(date_time) != 16:
+            return Response({'message':' You need to specify a correct `datetime` in the post request: yyyy-mm-dd hh:mm'}, status=500)
+        try:
+            date, time = date_time.split(' ')
+            date = datetime(*(int(date_item) for date_item in date.split('-')), *(int(time_item) for time_item in time.split(':')))
+        except Exception as error:
+            return Response({'message': 'Invalid date: {}'.format(error)}, status=500)
 
         for workout_type_id, sets in workout.items():
-            workout = Workouts.objects.create(user=request.user, workout_type_id=workout_type_id)
+            workout = Workouts.objects.create(user=request.user, workout_type_id=workout_type_id, date=date)
             for reps in sets:
                 WorkoutSets.objects.create(workout=workout, reps=reps)
 

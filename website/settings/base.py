@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'zw-kuo28a93=1f)6l6@huvss$nu^nwx7#1yhq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'pushupfactory.homeofthehappy.nl']
 
 #INTERNAL_IPS = ['127.0.0.1']
 

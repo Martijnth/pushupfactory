@@ -18,14 +18,15 @@
         var config = {
             type: 'line',
             data: {
-                labels: {{graph_data.timestamps}},
+                labels: {{timestamps}},
                 datasets: [
-                {% for user_id, data in graph_data.users.items %}
-                    {label: '{{data.name}}', backgroundColor: window.chartColors[{{user_id}}], borderColor: window.chartColors[{{user_id}}], data: {{data.data}}, fill: false},
+                {% for user_id, data in team_members.items %}
+                    {label: '{{data.name}}', backgroundColor: window.chartColors[{{user_id}}], borderColor: window.chartColors[{{user_id}}], data: [{% for data_point in data.data %}{% if data_point is None %}null{% else %}{{data_point}}{% endif %},{% endfor %}], fill: false},
                 {% endfor %}
                 ]
             },
             options: {
+                spanGaps: true,
                 responsive: true,
                 title: {
                     display: true,
