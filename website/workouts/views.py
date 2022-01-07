@@ -6,36 +6,45 @@ from rest_framework.response import Response
 from workouts.models import Workouts, WorkoutSets
 
 from datetime import datetime
+import json
 
 
 # Create your views here.
 class WorkoutsAPI(viewsets.ViewSet):
 
     authentication_classes = [authentication.TokenAuthentication]
+
     def add_workout(self, request):
         if request.user.is_anonymous:
             return Response(status=404)
 
         workout = request.data.get('workout', None)
         if workout is None:
-            return Response({'message':' You need to specify a `workout` in the post request'}, status=500)
+            return Response({'message': 'You need to specify a `workout` in the post request'}, status=500)
+
+        if type(workout) is str:
+            workout = json.loads(workout)
 
         date_time = request.data.get('date', None)
         if date_time is None or len(date_time) != 16:
-            return Response({'message':' You need to specify a correct `datetime` in the post request: yyyy-mm-dd hh:mm'}, status=500)
+            return Response({'message': 'You need to specify a correct `datetime` in the post request: yyyy-mm-dd hh:mm'}, status=500)
         try:
             date, time = date_time.split(' ')
             date = datetime(*(int(date_item) for date_item in date.split('-')), *(int(time_item) for time_item in time.split(':')))
         except Exception as error:
             return Response({'message': 'Invalid date: {}'.format(error)}, status=500)
 
-        for workout_type_id, sets in workout.items():
-            workout = Workouts.objects.create(user=request.user, workout_type_id=workout_type_id, date=date)
-            for reps in sets:
-                WorkoutSets.objects.create(workout=workout, reps=reps)
+        try:
+            for workout_type_id, sets in workout.items():
+                workout = Workouts.objects.create(user=request.user, workout_type_id=workout_type_id, date=date)
+                for reps in sets:
+                    WorkoutSets.objects.create(workout=workout, reps=reps)
+        except Exception as error:
+            return Response({'message': 'Error: {}'.format(error)}, status=500)
 
         print(request.user, request.data)
         return Response()
+
 
 def quick_import(request):
     # Workouts.objects.all().delete()
