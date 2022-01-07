@@ -29,11 +29,11 @@ class VisualisationView(viewsets.ViewSet):
             start_date = Workouts.objects.aggregate(min_date=Min('date'))
             start_date = start_date['min_date']
 
-        if start_date.year < today.year:
-            start_date = datetime(today.year, 1, 1, 0, 0, tzinfo=timezone.utc)
+        # if start_date.year < today.year:
+            # start_date = datetime(today.year, 1, 1, 0, 0, tzinfo=timezone.utc)
 
 
-
+        # print(start_date)
         # Get all the workouts for the users in this team
         workout_sets = WorkoutSets.objects.filter(workout__user_id__in=team.users.values('user_id'))
 
