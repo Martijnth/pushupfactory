@@ -1,5 +1,10 @@
 from django.db import models
-from main.models import Users, Teams
+from main.models import Users
+
+
+class WorkoutTypesManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().order_by('name')
 
 
 class WorkoutTypes(models.Model):
@@ -12,6 +17,11 @@ class WorkoutTypes(models.Model):
     deleted = models.BooleanField(default=False)
     name = models.CharField(max_length=100, blank=False, null=False)
 
+    objects = WorkoutTypesManager()
+
+    def __str__(self):
+        return f'<WorkoutType: {self.name}>'
+
 
 class Workouts(models.Model):
     """
@@ -19,7 +29,7 @@ class Workouts(models.Model):
     """
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     date = models.DateTimeField(blank=False, null=False)
 
     deleted = models.BooleanField(default=False)

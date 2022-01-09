@@ -15,25 +15,50 @@ from copy import copy
 class VisualisationView(viewsets.ViewSet):
 
     def render_team_workout(self, request, team_id, workout_type_id=None):
+        start_date = request.data.get('start_date', request.session.get('start_date', None))
+        end_date = request.data.get('end_date', request.session.get('end_date', None))
+        show_daily_totals = request.data.get('show_daily_totals', request.session.get('show_daily_totals', False))
+
+        if len(request.data) > 0:
+            if start_date == '':
+                start_date = None
+                request.session['start_date'] = None
+            else:
+                request.session['start_date'] = start_date
+
+            if end_date == '':
+                end_date = None
+                request.session['end_date'] = None
+            else:
+                request.session['end_date'] = end_date
+
+            if show_daily_totals == 'on':
+                show_daily_totals = True
+                request.session['show_daily_totals'] = True
+            else:
+                show_daily_totals = False
+                request.session['show_daily_totals'] = False
+
+            request.session.MODIFIED = True
 
         try:
             team = Teams.objects.get(pk=team_id)
         except Teams.DoesNotExist:
             return HttpResponse(status=404)
 
-        start_date = None
-        today = timezone.now()
-        end_date = timezone.now()
+        # Convert from string...lazy..
+        if start_date is not None:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').replace(tzinfo=timezone.utc)
+        if end_date is not None:
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').replace(tzinfo=timezone.utc)
+
+        if end_date is None:
+            end_date = timezone.now()
 
         if start_date is None:
             start_date = Workouts.objects.aggregate(min_date=Min('date'))
             start_date = start_date['min_date']
 
-        # if start_date.year < today.year:
-            # start_date = datetime(today.year, 1, 1, 0, 0, tzinfo=timezone.utc)
-
-
-        # print(start_date)
         # Get all the workouts for the users in this team
         workout_sets = WorkoutSets.objects.filter(workout__user_id__in=team.users.values('user_id'))
 
@@ -61,4 +86,14 @@ class VisualisationView(viewsets.ViewSet):
         # result['timestamps'] = sorted(set(timestamps))
         # print(timestamps)
         # print(team_member_result)
-        return render(request, 'render_team_workout.html', {'timestamps': timestamps, 'team_members': team_member_result})
+        print(start_date, end_date, request.session['start_date'], request.session['end_date'])
+        return render(request, 'render_team_workout.html', {
+            'timestamps': timestamps,
+            'team_members': team_member_result,
+            'team_id': team_id,
+            'start_date': request.session['start_date'],
+            'end_date': request.session['end_date'],
+            'show_daily_totals': show_daily_totals,
+        })
+
+

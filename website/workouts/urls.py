@@ -1,5 +1,5 @@
 from django.urls import path
-from workouts.views import WorkoutsAPI, quick_import
+from workouts.views import WorkoutsAPI, WorkoutsView
 app_name = 'workouts'
 
 urlpatterns = [
@@ -7,8 +7,6 @@ urlpatterns = [
         WorkoutsAPI.as_view({'post': 'add_workout'}),
         name="admin_api_workout"),
 
-    path('quick_import/',
-        quick_import,
-        name="admin_api_workout"),
-
+    path('workouts/', WorkoutsView.as_view({'get': 'render_workouts', 'post': 'save_workouts'}), name='workouts'),
+    # path('workouts/', WorkoutsView.as_view({}), name='save_workouts'),-
 ]

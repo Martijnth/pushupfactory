@@ -1,12 +1,6 @@
 from django.db import models
-from django.db.models import Value, Q, F, ExpressionWrapper, Sum
-from django.db.models.functions import Concat
-from django.utils.translation import ugettext_lazy as _
 
-from django.contrib.auth.models import AbstractUser, BaseUserManager
-
-from datetime import datetime
-import operator
+from django.contrib.auth.models import AbstractUser
 
 
 class Users(AbstractUser):
@@ -15,7 +9,6 @@ class Users(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
 
     deleted = models.BooleanField(default=False)
-
 
 
 class Teams(models.Model):

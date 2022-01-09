@@ -12,8 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 import os
 from unipath import Path
-from django.utils.translation import ugettext_lazy as _
-import json
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,9 +29,6 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'pushupfactory.homeofthehappy.nl']
 
-#INTERNAL_IPS = ['127.0.0.1']
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -46,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'main',
+    'chrono',
     'workouts',
     'visualisation',
     'compressor',
@@ -59,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'main.middleware.AuthRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'main.urls'
@@ -126,18 +124,16 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 LANGUAGES = [
-    ('nl', _('Dutch')),
     ('en', _('English')),
-    ('de', _('German')),
-    ('pl', _('Polish')),
+    ('nl', _('Dutch')),
 ]
 
 LANGUAGE_CODE = 'nl'
-# TIME_ZONE = 'Europe/Amsterdam'
+TIME_ZONE = 'Europe/Amsterdam'
 
-TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC'
 
-USE_I18N = True
+USE_I18N = False
 
 USE_L10N = True
 
@@ -184,3 +180,6 @@ CACHES = {
     }
 }
 AUTH_USER_MODEL = 'main.Users'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+DEFAULT_CHARSET = 'utf8'

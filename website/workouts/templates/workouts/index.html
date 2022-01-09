@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Workouts</title>
+    <link rel="stylesheet" href="{% static "css/pure-min.css" %}">
+    <style type="text/css">
+        button{
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="pure-g">
+        <div class="pure-u-5-5" style="height:50px;">
+            <h3 style="text-align: center;">Pushup factory</h3>
+        </div>
+        <div class="pure-u-5-5" style="height: calc(100vh - 100px); max-height:  calc(100vh - 100px);overflow-y: scroll;">
+            <form class="pure-form" method="POST" action="/workouts/">
+                {% csrf_token %}
+                <input type="hidden" name="workout_type_id" id="workout_type_id" value=""/>
+                <div class="pure-g">
+                    <input class="pure-u-5-5" type="number" name="amount" id="amount" required="" placeholder="Amount"/>
+                    <label class="pure-u-5-5" style="text-align: center;">Frequently used</label>
+                    {% for workout_type in most_used_workout_types %}
+                        <button class="pure-u-5-5 pure-button pure-button-primary js-workoutButton" data-workout_type_id="{{workout_type.pk}}" style="margin-top: 2px;">{{workout_type.name}}</button>
+                    {% endfor %}
+                </div>
+                <div class="pure-g">
+                    <label class="pure-u-5-5" style="text-align: center;">Other workouts</label>
+                    {% for workout_type in other_workout_types %}
+                        <button class="pure-u-5-5 pure-button pure-button-primary js-workoutButton" data-workout_type_id="{{workout_type.pk}}" style="margin-top: 2px;">{{workout_type.name}}</button>
+                    {% endfor %}
+                </div>
+            </form>
+        </div>
+        <div class="pure-u-5-5" style="height: 50px;">
+            <span style="text-align: center;color: #CCC;display: block;margin-top: 15px;">(c) 2022</span>
+        </div>
+    </div>
+    <script type="text/javascript">
+        function setWorkoutType(evt){
+            let amount = document.getElementById('amount');
+            document.getElementById('workout_type_id').value = evt.srcElement.dataset.workout_type_id;
+            if (amount.value == ''){
+                evt.preventDefault();
+                amount.style.borderColor = '#FF0000';
+            }
+
+        }
+        window.addEventListener('load', function () {
+            let elem;
+            for (elem of document.getElementsByClassName('js-workoutButton')){
+                elem.addEventListener('click', setWorkoutType, false)
+            }
+        }, false);
+    </script>
+</body>
+</html>
