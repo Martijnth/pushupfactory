@@ -70,29 +70,17 @@ class VisualisationView(viewsets.ViewSet):
 
         team_member_result = {team_member[0]: {'name': team_member[1], 'data': [None] * len(timestamps)} for team_member in Workouts.objects.values('user_id').filter(date__gte=start_date, date__lte=end_date).order_by('user_id').distinct().values_list('user_id', 'user__first_name')}
 
-        # result = {(start_date + timedelta(days=day_index)).strftime('%Y-%m-%d'): copy(team_members) for day_index in range((end_date - start_date).days)}
-        # print(result)
-        # timestamps = []
-        # print(result)
         for workout_set in workout_sets:
             set_date = workout_set.workout.date.strftime('%Y-%m-%d')
             day_index = timestamps.index(set_date)
             team_member_result[workout_set.workout.user_id]['data'][day_index] = workout_set.reps if (team_member_result[workout_set.workout.user_id]['data'][day_index] is None or team_member_result[workout_set.workout.user_id]['data'][day_index] < workout_set.reps) and workout_set.reps > 0 else team_member_result[workout_set.workout.user_id]['data'][day_index]
-            # print(set_date, workout_set.workout.user_id)
-            # result[set_date][workout_set.workout.user_id] = workout_set.reps if result[set_date][workout_set.workout.user_id] is None or result[set_date][workout_set.workout.user_id] < workout_set.reps else result[set_date][workout_set.workout.user_id]
-            # user_sets = result['users'].setdefault(workout_set.workout.user_id, {'name': workout_set.workout.user.first_name, 'data': []})
-            # user_sets['data'].append(workout_set.reps)
 
-        # result['timestamps'] = sorted(set(timestamps))
-        # print(timestamps)
-        # print(team_member_result)
-        print(start_date, end_date, request.session['start_date'], request.session['end_date'])
         return render(request, 'render_team_workout.html', {
             'timestamps': timestamps,
             'team_members': team_member_result,
             'team_id': team_id,
-            'start_date': request.session['start_date'],
-            'end_date': request.session['end_date'],
+            'start_date': request.session.get('start_date', None),
+            'end_date': request.session.get('end_date', None),
             'show_daily_totals': show_daily_totals,
         })
 
