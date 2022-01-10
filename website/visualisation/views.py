@@ -48,12 +48,12 @@ class VisualisationView(viewsets.ViewSet):
 
         # Convert from string...lazy..
         if start_date is not None:
-            start_date = datetime.strptime(start_date, '%Y-%m-%d').replace(tzinfo=timezone.utc)
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').replace(tzinfo=timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
         if end_date is not None:
-            end_date = datetime.strptime(end_date, '%Y-%m-%d').replace(tzinfo=timezone.utc)
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').replace(tzinfo=timezone.utc).replace(hour=23, minute=59, second=0, microsecond=0)
 
         if end_date is None:
-            end_date = timezone.now()
+            end_date = timezone.now().replace(hour=23, minute=59, second=0, microsecond=0)
 
         if start_date is None:
             start_date = Workouts.objects.aggregate(min_date=Min('date'))
