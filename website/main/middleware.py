@@ -13,7 +13,7 @@ class AuthRequiredMiddleware(object):
         url = resolve(request.path)
 
         # we need to get the person (and set the language) right at the start
-        if request.user.is_authenticated or url.url_name == 'login':
+        if request.user.is_authenticated or url.url_name == 'login' or url.url_name == 'admin_api_workout':
 
             if request.user.is_anonymous:
                 response = self.get_response(request)
@@ -21,5 +21,4 @@ class AuthRequiredMiddleware(object):
 
             response = self.get_response(request)
             return response
-        print('Why?', request.user)
         return HttpResponseRedirect('/login/')

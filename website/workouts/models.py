@@ -55,6 +55,7 @@ class WorkoutSets(models.Model):
     workout = models.ForeignKey(Workouts, blank=False, null=False, on_delete=models.CASCADE)
 
     reps = models.IntegerField(default=0)
+    weight = models.FloatField(default=0)
 
     objects = WorkoutSetsManager()
 

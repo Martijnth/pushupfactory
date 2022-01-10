@@ -53,12 +53,15 @@ class WorkoutsView(viewsets.ViewSet):
     def save_workouts(self, request):
         workout_type_id = request.data.get('workout_type_id', None)
         amount = request.data.get('amount', None)
+        weight = request.data.get('weight', 0)
+        if weight == '':
+            weight = 0
         if workout_type_id is not None and amount is not None:
             try:
                 current_workout = Workouts.objects.get(user=request.user, workout_type_id=workout_type_id, date__gte=datetime.now() - timedelta(minutes=30))
             except Workouts.DoesNotExist:
                 current_workout = Workouts.objects.create(user=request.user, workout_type_id=workout_type_id, date=datetime.now())
 
-            WorkoutSets.objects.create(workout=current_workout, reps=amount)
+            WorkoutSets.objects.create(workout=current_workout, reps=amount, weight=weight)
             print(request.data)
         return self.render_workouts(request)
