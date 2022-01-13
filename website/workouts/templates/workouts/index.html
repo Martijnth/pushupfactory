@@ -22,8 +22,8 @@
                 {% csrf_token %}
                 <input type="hidden" name="workout_type_id" id="workout_type_id" value=""/>
                 <div class="pure-g">
-                    <input class="pure-u-5-5" type="number" name="amount" id="amount" required="" placeholder="Amount"/>
-                    <input class="pure-u-5-5" type="number" name="weight" id="weight" placeholder="Weight"/>
+                    <input class="pure-u-5-5" type="number" name="amount" id="amount" required="" placeholder="Amount / seconds"/>
+                    <input class="pure-u-5-5" type="number" name="weight" id="weight" placeholder="Extra weight / distance"/>
                     <label class="pure-u-5-5" style="text-align: center;">Frequently used</label>
                     {% for workout_type in most_used_workout_types %}
                         <button class="pure-u-5-5 pure-button pure-button-primary js-workoutButton" data-workout_type_id="{{workout_type.pk}}" style="margin-top: 2px;">{{workout_type.name}}</button>
