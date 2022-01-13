@@ -18,6 +18,7 @@ class VisualisationView(viewsets.ViewSet):
         start_date = request.data.get('start_date', request.session.get('start_date', None))
         end_date = request.data.get('end_date', request.session.get('end_date', None))
         show_daily_totals = request.data.get('show_daily_totals', request.session.get('show_daily_totals', False))
+        workout_type_id = int(request.data.get('workout_type_id', request.session.get('workout_type_id', 1)))
 
         if len(request.data) > 0:
             if start_date == '':
@@ -39,6 +40,7 @@ class VisualisationView(viewsets.ViewSet):
                 show_daily_totals = False
                 request.session['show_daily_totals'] = False
 
+            request.session['workout_type_id'] = workout_type_id
             request.session.MODIFIED = True
 
         try:
@@ -60,7 +62,7 @@ class VisualisationView(viewsets.ViewSet):
             start_date = start_date['min_date']
 
         # Get all the workouts for the users in this team
-        workout_sets = WorkoutSets.objects.filter(workout__user_id__in=team.users.values('user_id'))
+        workout_sets = WorkoutSets.objects.filter(workout__workout_type_id=workout_type_id, workout__user_id__in=team.users.values('user_id'))
 
         workout_sets = workout_sets.filter(workout__date__gte=start_date, workout__date__lte=end_date)
 
@@ -68,12 +70,26 @@ class VisualisationView(viewsets.ViewSet):
 
         timestamps = [(start_date + timedelta(days=day_index)).strftime('%Y-%m-%d') for day_index in range((end_date - start_date).days + 1)]
 
-        team_member_result = {team_member[0]: {'name': team_member[1], 'data': [None] * len(timestamps)} for team_member in Workouts.objects.values('user_id').filter(date__gte=start_date, date__lte=end_date).order_by('user_id').distinct().values_list('user_id', 'user__first_name')}
+        team_member_result = {
+            team_member[0]: {
+                'name': team_member[1],
+                'data': [None] * len(timestamps)
+            } for team_member in Workouts.objects.values('user_id').filter(date__gte=start_date, date__lte=end_date).order_by('user_id').distinct().values_list('user_id', 'user__first_name')
+        }
 
         for workout_set in workout_sets:
             set_date = workout_set.workout.date.strftime('%Y-%m-%d')
             day_index = timestamps.index(set_date)
-            team_member_result[workout_set.workout.user_id]['data'][day_index] = workout_set.reps if (team_member_result[workout_set.workout.user_id]['data'][day_index] is None or team_member_result[workout_set.workout.user_id]['data'][day_index] < workout_set.reps) and workout_set.reps > 0 else team_member_result[workout_set.workout.user_id]['data'][day_index]
+            if show_daily_totals is False:
+                if (team_member_result[workout_set.workout.user_id]['data'][day_index] is None or team_member_result[workout_set.workout.user_id]['data'][day_index] < workout_set.reps) and workout_set.reps > 0:
+                    team_member_result[workout_set.workout.user_id]['data'][day_index] = workout_set.reps
+
+            # Aggregate them (maybe we can do this in the SQL)
+            else:
+                if team_member_result[workout_set.workout.user_id]['data'][day_index] is None:
+                    team_member_result[workout_set.workout.user_id]['data'][day_index] = workout_set.reps
+                else:
+                    team_member_result[workout_set.workout.user_id]['data'][day_index] += workout_set.reps
 
         return render(request, 'render_team_workout.html', {
             'timestamps': timestamps,
@@ -82,6 +98,8 @@ class VisualisationView(viewsets.ViewSet):
             'start_date': request.session.get('start_date', None),
             'end_date': request.session.get('end_date', None),
             'show_daily_totals': show_daily_totals,
+            'workout_type_id': workout_type_id,
+            'workout_types': WorkoutTypes.objects.all(),
         })
 
 

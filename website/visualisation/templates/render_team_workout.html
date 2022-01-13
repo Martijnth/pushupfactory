@@ -21,20 +21,25 @@
                 {% csrf_token %}
                 <fieldset>
                     <div class="pure-control-group">
+                        <label for="workout_type_id">Workout type</label>
+                        {{workout_type_id}}
+                        <select id="workout_type_id" name="workout_type_id">
+                            {% for workout_type in workout_types %}
+                                <option{% if workout_type_id == workout_type.pk %} SELECTED="SELECTED"{% endif %} value="{{workout_type.pk}}">{{workout_type.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="pure-control-group">
                         <label for="start_date">Start date</label>
-                        {{start_date}}
                         <input type="date" name="start_date" id="start_date" style="width: 100%" value="{{start_date}}"/>
                     </div>
                     <div class="pure-control-group" style="margin-top: 20px;">
                         <label for="end_date">End date</label>
-                        {{end_date}}
                         <input type="date" name="end_date" id="end_date" style="width: 100%" {% if end_date != None %}value="{{end_date}}"{% endif %}/>
                     </div>
-                    <!--
                     <div class="pure-control-group" style="margin-top: 20px;">
                         <label for="show_daily_totals"><input type="checkbox" {% if show_daily_totals is True %} CHECKED="CHECKED"{% endif %} id="show_daily_totals" name="show_daily_totals"><span style="margin-left: 10px;">Show daily totals</span></label>
                     </div>
-                    !-->
                 </fieldset>
                 <input type="submit" class="pure-button pure-button-primary" value="Refresh">
             </form>
